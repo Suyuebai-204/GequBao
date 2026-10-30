@@ -1,71 +1,384 @@
 :root {
   color-scheme: dark;
-  font-family: 'Segoe UI', 'Microsoft YaHei', system-ui, sans-serif;
-  color: #e6e6f0;
-  background: #1b1b23;
+
+  /* Fluent 深色分层：无渐变、无光晕，靠层级与细边框区分 */
+  --bg: #202020;
+  --surface: #2b2b2b;
+  --surface-2: #323232;
+  --surface-hover: rgba(255, 255, 255, 0.045);
+  --surface-active: rgba(255, 255, 255, 0.08);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --text: #f3f3f3;
+  --text-2: #b3b3b3;
+  --text-3: #8a8a8a;
+  --accent: #60cdff;
+  --accent-hover: #7ad4ff;
+  --on-accent: #000;
+  --danger: #ff5d6c;
+
+  --titlebar: #1b1b1b;
+  --sidebar: #1b1b1b;
+  --code-bg: #323232;
+  --code-text: #c8e1ff;
+  --scrollbar: #4a4a4a;
+
+  /* 圆角刻度：小控件 6 / 卡片封面 8 / 浮层面板 12，全局只用这三档 */
+  --radius-sm: 6px;
+  --radius: 8px;
+  --radius-lg: 12px;
+  /* 自绘标题栏高度：全屏播放页据此让出窗口拖拽区 */
+  --titlebar-h: 32px;
+  --gap: 12px;
+  --ease: cubic-bezier(0.33, 0.9, 0.5, 1);
+  --t: 0.14s cubic-bezier(0.33, 0.9, 0.5, 1);
+
+  /* 控件尺寸 / 层级阴影 / 滑块轨道：统一调用，避免各组件各写一套 */
+  --control-h: 30px; /* 文字按钮、输入框 */
+  --control-h-lg: 34px; /* 纯图标按钮：更大的触摸区 */
+  --control-h-xl: 44px; /* 主播放按钮 */
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.14);
+  --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.18);
+  --shadow-3: 0 12px 34px rgba(0, 0, 0, 0.3);
+  --slider-track: rgba(255, 255, 255, 0.24);
+  --slider-track-hover: rgba(255, 255, 255, 0.34);
+  /* 播放页磨砂封面背景：压暗 + 降透明度，保证歌词高亮色（accent）仍是画面最亮的点 */
+  --sheet-backdrop-filter: blur(72px) saturate(1.6) brightness(0.5);
+  --sheet-backdrop-opacity: 1;
+  --sheet-scrim-opacity: 0.74;
+  --sheet-vignette: rgba(0, 0, 0, 0.3);
+  --caption-hover: rgba(255, 255, 255, 0.06);
+  --caption-close: #c42b1c;
+
+  font-family: 'Segoe UI Variable Text', 'Segoe UI', 'Microsoft YaHei', system-ui, sans-serif;
+  color: var(--text);
+  background: var(--bg);
 }
 
+/* 浅色主题：由设置页切换（html.theme-light） */
+html.theme-light {
+  color-scheme: light;
+
+  --bg: #f9f9f9;
+  --surface: #ffffff;
+  --surface-2: #f0f0f0;
+  --surface-hover: rgba(0, 0, 0, 0.045);
+  --surface-active: rgba(0, 0, 0, 0.08);
+  --border: rgba(0, 0, 0, 0.1);
+  --border-strong: rgba(0, 0, 0, 0.18);
+  --text: #1b1b1b;
+  --text-2: #5c5c5c;
+  --text-3: #8a8a8a;
+  --accent: #0067c0;
+  --accent-hover: #1a76d2;
+  --on-accent: #fff;
+  --danger: #d13438;
+
+  --titlebar: #f0f0f0;
+  --sidebar: #f0f0f0;
+  --code-bg: #f0f0f0;
+  --code-text: #005a9e;
+  --scrollbar: #c8c8c8;
+
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.08);
+  --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --shadow-3: 0 12px 34px rgba(0, 0, 0, 0.16);
+  --slider-track: rgba(0, 0, 0, 0.22);
+  --slider-track-hover: rgba(0, 0, 0, 0.32);
+  --caption-hover: rgba(0, 0, 0, 0.05);
+
+  --sheet-backdrop-filter: blur(72px) saturate(1.7) brightness(1.05);
+  --sheet-backdrop-opacity: 1;
+  --sheet-scrim-opacity: 0.87;
+  --sheet-vignette: rgba(255, 255, 255, 0.55);
+}
+
+* { box-sizing: border-box; }
+
+html, body, #app { margin: 0; height: 100%; overflow: hidden; }
+
+body { font-size: 14px; line-height: 1.5; }
+
+/* 原生控件不继承字体，这里统一，避免个别按钮回落到浏览器默认字体 */
+button { font: inherit; }
+
+/* 桌面软件观感：默认禁止鼠标选中文本，仅输入框内保留可选可编辑 */
 * {
-  box-sizing: border-box;
+  -webkit-user-select: none;
+  user-select: none;
+}
+input,
+textarea,
+[contenteditable='true'],
+[contenteditable=''] {
+  -webkit-user-select: text;
+  user-select: text;
 }
 
-html,
-body,
-#app {
+::selection { background: var(--accent); color: var(--on-accent); }
+
+/* ---------- 文本 ---------- */
+h1, h2, h3, h4, h5, h6 {
   margin: 0;
-  height: 100%;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text);
+}
+h1 { font-size: 20px; }
+h2 { font-size: 16px; }
+h3 { font-size: 14px; }
+p { margin: 0; color: var(--text-2); }
+small, .muted { color: var(--text-3); font-size: 12px; }
+
+a { color: var(--accent); text-decoration: none; transition: color var(--t); }
+a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+code, pre {
+  font-family: Consolas, 'Cascadia Mono', monospace;
+  background: var(--code-bg);
+  color: var(--code-text);
+  border-radius: var(--radius-sm);
+}
+code { font-size: 0.9em; padding: 1px 5px; }
+pre { padding: 10px 12px; overflow: auto; font-size: 12px; }
+
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-code {
-  font-family: Consolas, 'Cascadia Code', monospace;
-  font-size: 0.92em;
-  padding: 1px 6px;
-  border-radius: 4px;
-  background: #2c2c37;
-  color: #8bc9ff;
-}
+/* ---------- 图片 / 媒体 ---------- */
+img, video { max-width: 100%; height: auto; display: block; border-radius: var(--radius-sm); }
 
-.app-body {
-  height: calc(100% - 32px);
-  padding: 40px 48px;
-  overflow: auto;
-}
+/* ---------- 布局工具类 ---------- */
+.container { max-width: 1080px; margin-inline: auto; padding-inline: 24px; }
+.row { display: flex; align-items: center; gap: var(--gap); }
+.col { display: flex; flex-direction: column; gap: var(--gap); }
+.center { align-items: center; justify-content: center; }
+.between { justify-content: space-between; }
+.wrap { flex-wrap: wrap; }
+.grid { display: grid; gap: var(--gap); }
+.stack { display: flex; flex-direction: column; gap: var(--gap); }
+.divider { height: 1px; background: var(--border); border: 0; }
+.spacer { flex: 1; }
 
-.hero h1 {
-  margin: 0 0 8px;
-  font-size: 28px;
-  font-weight: 600;
-}
-
-.hero p {
-  margin: 0 0 32px;
-  color: #9a9ab0;
-}
-
-.cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 16px;
-  margin-bottom: 36px;
-}
-
+/* ---------- 卡片 ---------- */
 .card {
-  padding: 18px 20px;
-  border: 1px solid #2e2e3a;
-  border-radius: 10px;
-  background: #21212a;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
 }
 
-.card h2 {
-  margin: 0 0 8px;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.card p {
-  margin: 0;
+/* ---------- 按钮 / 图标按钮（全局统一调用） ---------- */
+.btn,
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font: inherit;
   font-size: 13px;
-  line-height: 1.7;
-  color: #9a9ab0;
+  color: var(--text);
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--t), border-color var(--t), color var(--t), opacity var(--t);
 }
+
+.btn {
+  gap: 6px;
+  height: var(--control-h);
+  padding: 0 12px;
+  background: var(--surface-2);
+}
+.btn:hover { background: var(--surface-active); }
+.btn:active { opacity: 0.85; }
+.btn:disabled { opacity: 0.45; cursor: default; }
+
+/* 无底色的文字按钮：用于次要动作 */
+.btn-subtle { background: transparent; color: var(--text-2); }
+.btn-subtle:hover { background: var(--surface-hover); color: var(--text); }
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.btn-primary:hover { background: var(--accent-hover); }
+
+/* 纯图标按钮：34×34，hover 仅给一层浅底，和标题栏/播放器保持一致 */
+.icon-btn {
+  width: var(--control-h-lg);
+  height: var(--control-h-lg);
+  padding: 0;
+  background: transparent;
+  color: var(--text-2);
+}
+.icon-btn:hover { background: var(--surface-hover); color: var(--text); }
+.icon-btn:active { background: var(--surface-active); }
+.icon-btn:disabled { opacity: 0.35; cursor: default; background: transparent; }
+
+/* ---------- 表单 ---------- */
+input,
+textarea,
+select {
+  width: 100%;
+  height: var(--control-h);
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-bottom: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  transition: background var(--t), border-color var(--t);
+}
+input:hover,
+textarea:hover,
+select:hover { background: var(--surface-active); }
+
+textarea { height: auto; padding: 6px 10px; line-height: 1.5; }
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 0;
+  background: var(--surface);
+  border-bottom-color: var(--accent);
+}
+
+/* 焦点环：只给输入类控件；按钮靠 hover/active 反馈，避免点击后残留方框 */
+:focus-visible { outline: 1px solid var(--accent); outline-offset: 1px; }
+button:focus,
+button:focus-visible { outline: none; }
+
+/* 滑块：细轨道 + 小圆点，避免 Chromium 默认的大蓝条 */
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: auto;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+input[type='range']::-webkit-slider-runnable-track {
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(
+    to right,
+    var(--accent) 0 var(--fill, 0%),
+    var(--slider-track) var(--fill, 0%) 100%
+  );
+}
+input[type='range']:hover::-webkit-slider-runnable-track {
+  background: linear-gradient(
+    to right,
+    var(--accent-hover) 0 var(--fill, 0%),
+    var(--slider-track-hover) var(--fill, 0%) 100%
+  );
+}
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  margin-top: -4.5px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  transition: transform var(--t);
+}
+input[type='range']:hover::-webkit-slider-thumb { transform: scale(1.15); }
+input[type='range']:active::-webkit-slider-thumb { transform: scale(1.25); }
+
+/* ---------- 滚动条 ---------- */
+* { scrollbar-width: thin; scrollbar-color: var(--scrollbar) transparent; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb {
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: 5px;
+  background-clip: content-box;
+  box-shadow: inset 0 0 0 8px var(--scrollbar);
+}
+::-webkit-scrollbar-thumb:hover {
+  box-shadow: inset 0 0 0 8px var(--text-3);
+}
+
+/* ---------- 动画 ---------- */
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  from { background-position: -400px 0; }
+  to { background-position: 400px 0; }
+}
+.animate-fade { animation: fade-in 0.18s var(--ease) both; }
+.animate-up { animation: fade-up 0.22s var(--ease) both; }
+.skeleton {
+  border-radius: var(--radius-sm);
+  background: linear-gradient(90deg, var(--surface-2) 25%, var(--scrollbar) 37%, var(--surface-2) 63%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+}
+
+/* 视图切换过渡（App.vue <transition name="view">） */
+.view-enter-active, .view-leave-active {
+  transition: opacity 0.16s var(--ease), transform 0.16s var(--ease);
+}
+.view-enter-from { opacity: 0; transform: translateY(4px); }
+.view-leave-to { opacity: 0; }
+
+/* 标题栏不参与布局压缩 */
+.titlebar { flex-shrink: 0; }
+
+/* 播放浮层展开时锁定列表滚动（.content 由 App.vue 渲染） */
+html.player-open .content { overflow: hidden; }
+
+/* 内容视图统一节奏（作用于子组件根，需全局） */
+.view { display: flex; flex-direction: column; }
+.view h1 { font-size: 20px; }
+.view > .muted { margin: 4px 0 16px; }
+
+/* 紧凑数据表：真实软件的信息密度来源 */
+.table { display: flex; flex-direction: column; }
+.table-head,
+.table-row {
+  display: grid;
+  align-items: center;
+  column-gap: 14px; /* 右对齐列与下一列左对齐内容会贴在一起，如「时长」和「最近播放」 */
+  padding: 0 12px;
+  border-radius: var(--radius-sm);
+}
+.table-head {
+  height: 32px;
+  color: var(--text-3);
+  font-size: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.table-row {
+  height: 36px;
+  transition: background var(--t);
+}
+.table-row:hover { background: var(--surface-hover); }
+.table-row:active { background: var(--surface-active); }
+.num { font-variant-numeric: tabular-nums; color: var(--text-3); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+/* ============ 运行环境信息 ============ */
+.versions h2 { margin: 0 0 10px; font-size: 13px; font-weight: 600; color: var(--text-2); }
+.versions ul { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 12px; }
+.versions li { display: flex; align-items: center; gap: 6px; }
+.versions span { color: var(--text-3); }
