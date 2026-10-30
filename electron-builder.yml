@@ -1,0 +1,35 @@
+appId: com.example.vuewindowsapp
+productName: VueWindowsApp
+copyright: Copyright © 2026
+
+directories:
+  buildResources: build
+  output: dist
+
+files:
+  - out/**/*
+  - package.json
+
+win:
+  executableName: VueWindowsApp
+  target:
+    - target: nsis
+      arch:
+        - x64
+    - target: portable
+      arch:
+        - x64
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: ${productName}
+
+portable:
+  artifactName: ${productName}-${version}-portable.${ext}
+
+electronDownload:
+  mirror: https://npmmirror.com/mirrors/electron/
