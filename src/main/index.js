@@ -223,8 +223,8 @@ function registerSettingsIpc() {
       title: typeof title === 'string' && title ? title : '选择文件夹',
       properties: ['openDirectory']
     })
-    if (canceled || !filePaths?.length) return { canceled: true }
-    return { canceled: false, path: filePaths[0] }
+    if (canceled || !filePaths?.length) return { ok: false, canceled: true }
+    return { ok: true, canceled: false, path: filePaths[0] }
   })
 }
 
