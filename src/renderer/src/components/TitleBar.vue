@@ -19,7 +19,7 @@ onMounted(async () => {
 
 <template>
   <header class="titlebar">
-    <span class="title">歌曲宝 - 苏月白制作</span>
+    <span class="title">歌曲宝PC - 苏月白制作</span>
 
     <div class="actions">
       <button class="caption-btn" title="最小化" @click="minimize()">

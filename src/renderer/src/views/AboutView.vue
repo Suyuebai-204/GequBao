@@ -2,7 +2,7 @@
 import pkg from '../../../../package.json'
 import Icon from '../components/Icon.vue'
 
-const APP_NAME = '歌趣宝'
+const APP_NAME = '歌曲宝PC'
 const DEVELOPER = '苏月白'
 const REPO_URL = 'https://github.com/Suyuebai-204/GequBao'
 const SITE_URL = 'https://www.gequbao.com'
