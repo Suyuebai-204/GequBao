@@ -14,6 +14,10 @@
 - **下载**：一键另存为，边下边显示进度
 - **本地音乐**：选择文件夹扫描本机音频（mp3/flac/wav/m4a/aac/ogg/opus/ape），解析元数据与编码信息
 - **最近播放**：本地持久化，自动记录收听历史
+<img width="1122" height="721" alt="image" src="https://github.com/user-attachments/assets/5cd34ad3-655f-473c-9757-8b3719cb8ac5" />
+<img width="1122" height="721" alt="image" src="https://github.com/user-attachments/assets/ed3a2deb-0482-4a5a-9352-68fe965be80c" />
+<img width="1122" height="721" alt="image" src="https://github.com/user-attachments/assets/493ef6ee-11ae-4d9b-92ed-66af0379b6b0" />
+
 
 ---
 
